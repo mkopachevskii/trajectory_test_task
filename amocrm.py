@@ -76,7 +76,10 @@ class BaseEntity:
         return str(self)
 
     def get_field(self, field_name):
-        return self.custom_fields_values.get(field_name, {}).get('value')
+        if not self.custom_fields_values:
+            return None
+        field = self.custom_fields_values.get(field_name)
+        return field.get('value') if isinstance(field, dict) else None
 
     def set_field(self, field_name, field_value, field_id=None):
         custom_field = self.custom_fields_values.get(field_name)
@@ -95,6 +98,14 @@ class BaseEntity:
 
     def get_url(self):
         return self.url
+    
+    def as_dict(self) -> dict:
+        result = {}
+        for key, value in self.__dict__.items():
+            if key.startswith("_"):
+                continue
+            result[key] = value
+        return result
 
 
 class Customer(BaseEntity):
